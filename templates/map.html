@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+
+{% block title %} - Map {{ map.name }}{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+     crossorigin=""/>
+    <!-- Make sure you put this AFTER Leaflet's CSS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+     crossorigin=""></script>
+<link rel="stylesheet" href="/static/leaflet/Control.Geocoder.css"/>
+<script src="/static/leaflet/Control.Geocoder.js"></script>
+
+{% endblock %}
+
+{% block content %}
+Hi {{ user.username }}, welcome to Pinmap! Please start pinning on your map <em>{{ map.name }}</em> now.
+
+<form action="" method="post" id="form">
+<input type="hidden" name="rects" id="rects">
+<input type="hidden" name="zoom" id="zoom">
+<input type="hidden" name="lat" id="lat">
+<input type="hidden" name="lng" id="lng">
+{% csrf_token %}
+</form>
+Layer for new rectangles: 
+<select id="layer_selector">
+{% for l in layers %}
+<option value="{{ l.id }}">{{ l.name }}</option>
+{% endfor %}
+</select>
+<button onClick="submit()">Update map</button>
+<div style="height: 500px;" id="map"></div>
+<div>
+Layer:<br>
+{% for layer in layers %}
+  <span style="background-color: {{ layer.color }}">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>&nbsp;&nbsp;{{ layer.name }} ({{ layer.how_many_rectangles }} Rectangles)<br>
+{% endfor %}
+</div>
+<script>
+var map = L.map('map').setView([{{ map.lat }}, {{ map.lng }}], {{ map.zoom }});
+/*
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.{ext}', {
+    maxZoom: 19,
+    attribution: '&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    ext: 'png'
+}).addTo(map);
+*/
+// Check to see if Media-Queries are supported
+var theme = 'jawg-light'; // default
+if (window.matchMedia) {
+  // Check if the dark-mode Media-Query matches
+  if(window.matchMedia('(prefers-color-scheme: dark)').matches){ // Dark
+    theme = 'jawg-dark';
+  }
+}
+
+const layer = L.tileLayer(
+'https://tile.jawg.io/' + theme + '/{z}/{x}/{y}.png?lang=en&access-token=eZkSNZnEJZ0RYL6XpFCnV8WNJaSM6c6WSLyUJchDsCjHs4xHWughOaTEtCRBrtts', {
+attribution: '<a href="https://jawg.io" title="Tiles Courtesy of Jawg Maps" target="_blank" class="jawg-attrib">&copy; <b>Jawg</b>Maps</a> | <a href="https://www.openstreetmap.org/copyright" title="OpenStreetMap is open data licensed under ODbL" target="_blank" class="osm-attrib">&copy; OSM contributors</a>',
+maxZoom: 22,
+}
+).addTo(map);
+
+var layers = {};
+{% for l in layers %}
+  layers[{{ l.id }}] = "{{ l.color }}";
+{% endfor %}
+
+var markers = {};
+var lat_lng = [];
+{% for rect in rects %}
+  var bounds{{ rect.id }} = [[{{ rect.lat1 }}, {{ rect.lng1 }}],[{{ rect.lat2 }}, {{ rect.lng2 }}]];
+  var rect{{ rect.id }} = L.rectangle(bounds{{ rect.id }}, {color: '{{ rect.layer.color }}', weight: 3}).addTo(map);
+  markers[{{ rect.layer.id }} + "," + bounds{{ rect.id }}] = rect{{ rect.id }};
+  lat_lng.push([{{ rect.lat1 }}, {{ rect.lng1 }}]);
+  lat_lng.push([{{ rect.lat2 }}, {{ rect.lng2 }}]);
+{% endfor %}
+
+if (lat_lng.length > 0) {
+  var bounds = new L.LatLngBounds(lat_lng);
+  map.fitBounds(bounds);
+}
+
+L.Control.geocoder({
+  defaultMarkGeocode: false
+}).on('markgeocode', function(e) {
+    var bbox = e.geocode.bbox;
+    var poly = L.polygon([
+      bbox.getSouthEast(),
+      bbox.getNorthEast(),
+      bbox.getNorthWest(),
+      bbox.getSouthWest()
+    ]).addTo(map);
+    map.fitBounds(poly.getBounds());
+  }).addTo(map);
+
+function calculateBounds(e) {
+  return [[Math.floor(e.latlng.lat), Math.ceil(e.latlng.lng)], [Math.ceil(e.latlng.lat), Math.floor(e.latlng.lng)]];
+}
+
+function onMapClick(e) {
+  var layer_id = document.getElementById('layer_selector').value;
+  var bounds = calculateBounds(e);
+  var bounds_with_layer = layer_id + "," + bounds;
+  if (markers[bounds_with_layer]) {
+    map.removeLayer(markers[bounds_with_layer]);
+    markers[bounds_with_layer] = null;
+  } else {
+    var rect = L.rectangle(bounds, {color: layers[layer_id], weight: 3}).addTo(map);
+    markers[bounds_with_layer] = rect;
+  }
+}
+map.on('click', onMapClick);
+
+function submit() {
+  var rects = "";
+  for (var  l in markers) {
+    if (markers[l]) { rects += l + ";"; }
+  }
+  document.getElementById('rects').value = rects.slice(0,-1);
+  //alert(document.getElementById('rects').value)
+  document.getElementById('zoom').value = map.getZoom();
+  document.getElementById('lat').value = map.getCenter().lat;
+  document.getElementById('lng').value = map.getCenter().lng;
+  document.getElementById('form').submit();
+}
+</script>
+
+<a href="{% url 'manage_maps_details' map.id %}">Edit this map's layers</a>
+{% endblock %}

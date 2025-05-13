@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %} - Manage your map {{ map.name }}{% endblock %}
+
+{% block content %}
+Hi {{ user.username }}, welcome to Pinmap! Please update the layer <em>{{ layer.name }}</em> (map: <em>{{pinmap.name}}</em>) below or create a new layer.
+
+
+<details {{openform}}>
+<summary>Edit this layer</summary>
+<form action="" method="post">
+{% csrf_token %}
+{{ form }}
+<input type="submit">
+</form>
+</details>
+
+{% endblock %}

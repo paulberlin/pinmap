@@ -1,0 +1,9 @@
+{% if messages %}
+ {% for message in messages %}
+      <div>
+      {% if message.tags == "warning" %}⚠️{% endif %}
+      {% if message.tags == "success" %}ℹ️{% endif %}
+      &nbsp;&nbsp;{{ message|safe }}
+      </div>
+ {% endfor %}
+{% endif %}

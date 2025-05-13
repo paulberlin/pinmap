@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/simple.min.css">
+    <link rel="stylesheet" href="/static/custom.css">
+    <title>Pinmap{% block title %}{% endblock %}</title>
+    {% block head %}{% endblock %}
+</head>
+<body>
+  <header>
+    <a href="/"><img src="/static/pinmap.png" style="height: 100px" alt="Logo"/></a>
+{% if user.is_authenticated %}
+<nav>
+  <a href="{% url 'index' %}" {% if highlight == 'pin_maps' %}class="current"{% endif %}>Pin on Map</a>
+  <a href="{% url 'manage_maps' %}" {% if highlight == 'manage_maps' %}class="current"{% endif %}>Manage Maps</a>
+  <a id="logout_link" style="background:var(--accent);color:var(--bg);" href="#" onclick="document.getElementById('logout').submit()">Logout</a>
+  <script>document.getElementById("logout_link").href="#";</script>
+</nav>
+<form action="{% url 'logout' %}" method="post" id="logout">
+  {% csrf_token %}
+</form>
+{% else %}
+<nav>
+<a style="background:var(--accent);color:var(--bg);" href="{% url 'login' %}">Login</a>
+</nav>
+{% endif %}
+</header>
+
+<main>
+{% if user.is_authenticated %}
+
+{% block content %}Welcome to Pinmap.{% endblock %}
+
+{% else %}
+
+{% block login %}
+Please <a href="{% url 'login' %}">login</a> to get started.
+{% endblock %}
+
+{% endif %}
+
+</main>
+
+<footer>
+<p><a href="{% url 'about' %}">About</a> | &copy; Paul Führing</p>
+</footer>
+</body>
+</html>
+

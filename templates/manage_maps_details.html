@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %} - Manage your map {{ map.name }}{% endblock %}
+{% block head %}
+<script>
+function openEditDialog(id, name, color) {
+  document.getElementById('edit-dialog').showModal();
+  document.getElementById('edit-form').action = "/manage/layer/" + id + "/edit";
+  document.getElementById('edit-head').innerHTML = "Edit layer <em>" + name + "</em>";
+  document.getElementById('id_name').value = name;
+  document.getElementById('id_color').value = color;
+  
+}
+</script>
+{% endblock %}
+
+{% block content %}
+Hi {{ user.username }}, welcome to Pinmap! Please click the pencil to edit a layer of map <em>{{ map.name }}</em> or create a new layer.
+
+<dialog id="edit-dialog">
+<strong id="edit-head">Edit Layer</strong>
+<p>
+<form method="post" action="" id="edit-form">
+{% csrf_token %}
+{{ edit_layer_form }}
+<button>Confirm</button>
+</form>
+</p>
+<form method="dialog">
+<button>Nevermind</button>
+</form>
+</dialog>
+
+{% include "messages.html" %}
+
+<ul>
+{% for layer in layers %}
+<li><span style="background-color: {{ layer.color }}">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>&nbsp;&nbsp;{{ layer.name }}
+<span class="editicon" onclick="openEditDialog({{ layer.id }}, '{{ layer.name }}', '{{ layer.color }}')">✏️ </span>
+<br>({{ layer.how_many_rectangles }} Rectangles)
+</li>
+{% endfor %}
+</ul>
+
+<details {{ openform }}>
+<summary>Create a new layer</summary>
+<form action="" method="post">
+{% csrf_token %}
+{{ new_layer_form }}
+<button>Confirm</button>
+</form>
+</details>
+
+<a href="{% url 'map' map.id %}">Start pinning on this map</a>
+<br>
+<a href="{% url 'manage_maps' %}">Back to list of maps</a>
+{% endblock %}

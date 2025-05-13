@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %} - Manage your maps{% endblock %}
+{% block head %}
+<script>
+function openEditDialog(id, name) {
+  document.getElementById('edit-dialog').showModal();
+  document.getElementById('edit-form').action = "/manage/map/" + id + "/edit";
+  document.getElementById('edit-head').innerHTML = "Edit map <em>" + name + "</em>";
+  document.getElementById('id_name').value = name;
+}
+</script>
+{% endblock %}
+
+{% block content %}
+Hi {{ user.username }}, welcome to Pinmap! Please select a map to see its layers, click the pencil to edit it or create a new map below:
+
+<dialog id="edit-dialog">
+<strong id="edit-head">Edit Map</strong>
+<p>
+<form method="post" action="" id="edit-form">
+{% csrf_token %}
+{{ edit_form }}
+<button>Confirm</button>
+</form>
+</p>
+<form method="dialog">
+<button>Nevermind</button>
+</form>
+</dialog>
+
+{% include "messages.html" %}
+
+
+<ul>
+{% for map in maps %}
+<li><a href="{% url 'manage_maps_details' map.id %}">{{ map.name }}</a>
+<span class="editicon" onclick="openEditDialog({{ map.id }}, '{{ map.name }}')">✏️ </span>
+<br>({{ map.how_many_layers }} Layers, {{map.how_many_rectangles }} Rectangles) 
+</li>
+{% endfor %}
+</ul>
+
+<details {{openform}}>
+<summary>Create new map</summary>
+<form action="" method="post">
+{% csrf_token %}
+{{ new_form }}
+<input type="submit" value="Submit">
+</form>
+</details>
+
+{% endblock %}
