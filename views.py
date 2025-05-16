@@ -5,16 +5,18 @@ from django.shortcuts import get_object_or_404
 from django.shortcuts import get_list_or_404
 from django.conf import settings
 from django.contrib import messages
-
+from django.contrib.auth import login
 
 from .models import Map
 from .models import Layer
 from .models import Rectangle
+from .models import User
 
 from .forms import NewMap
 from .forms import ModifyMap
 from .forms import ModifyLayer
 from .forms import NewLayer
+from .forms import SignupForm
 
 def about(request):
   map_count = Map.objects.all().count()
@@ -23,11 +25,30 @@ def about(request):
   context = { "map_count": map_count, "layer_count": layer_count, "rect_count": rect_count }
   return render(request, 'about.html', context)
 
+def signup(request):
+  if request.user.is_authenticated:
+    return redirect('index')
+  form = SignupForm()
+  if request.method == 'POST':
+     user = User.objects.filter(email__exact=request.POST.get('email')).first()
+     if user:
+       messages.warning(request, 'Email address already in use.')
+       return redirect('login')
+     else:
+       form = SignupForm(request.POST)
+       if form.is_valid():
+         user = form.save()
+         if user:
+           login(request, user)
+           return redirect('index')
+  context = { "form": form }
+  return render(request, 'registration/signup.html', context)
+
 def index(request):
   if request.user.is_authenticated:
-    layer_count = Layer.objects.all().count()
-    rect_count = Rectangle.objects.all().count()
-    map_count = Map.objects.filter(owner__exact=request.user).count()
+    layer_count = Layer.objects.filter(owner=request.user).count()
+    rect_count = Rectangle.objects.filter(owner=request.user).count()
+    map_count = Map.objects.filter(owner=request.user).count()
     if map_count == 0:
       new_map = Map(owner=request.user, name='Default')
       new_map.save()

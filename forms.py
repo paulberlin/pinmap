@@ -1,9 +1,21 @@
 from django import forms
+from django.contrib.auth.forms import UserCreationForm
 import re
 
 from .models import Map
 from .models import Layer
 from .models import Rectangle
+from .models import User
+
+
+class SignupForm(UserCreationForm):
+  email = forms.EmailField(max_length=200, help_text='Required')
+
+  class Meta:
+    model = User
+    fields = ('username', 'email', 'password1', 'password2')
+
+
 
 class ModifyMap(forms.ModelForm):
   delete = forms.BooleanField(label='Delete', help_text="When you delete a Map, all its Layers and Rectangles are deleted as well.", required=False)

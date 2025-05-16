@@ -23,12 +23,15 @@
 </form>
 {% else %}
 <nav>
-<a style="background:var(--accent);color:var(--bg);" href="{% url 'login' %}">Login</a>
+  <a href="{% url 'signup' %}">Signup</a>
+  <a href="{% url 'login' %}">Login</a>
 </nav>
 {% endif %}
 </header>
 
 <main>
+{% include "messages.html" %}
+
 {% if user.is_authenticated %}
 
 {% block content %}Welcome to Pinmap.{% endblock %}

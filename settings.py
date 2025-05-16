@@ -23,10 +23,10 @@ MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-c4kf8x06kxba2ztj02paw6%d2lgroee(&hj7sp54qx(-b*4+&7'
+SECRET_KEY = 'django-insecure-#-c##o&a8%7$)4xa+g2adh@)m^dspq+4*+wysvh*pp8am8opab'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = [ 'pinmap.uber.space' ]
 

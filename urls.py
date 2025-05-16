@@ -17,4 +17,5 @@ urlpatterns = [
   # admin
   path('admin/', admin.site.urls),
   path("accounts/", include("django.contrib.auth.urls")),
+  path("accounts/signup", views.signup, name='signup'),
 ]

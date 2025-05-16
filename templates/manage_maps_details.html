@@ -31,8 +31,6 @@ Hi {{ user.username }}, welcome to Pinmap! Please click the pencil to edit a lay
 </form>
 </dialog>
 
-{% include "messages.html" %}
-
 <ul>
 {% for layer in layers %}
 <li><span style="background-color: {{ layer.color }}">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>&nbsp;&nbsp;{{ layer.name }}

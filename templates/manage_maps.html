@@ -29,9 +29,6 @@ Hi {{ user.username }}, welcome to Pinmap! Please select a map to see its layers
 </form>
 </dialog>
 
-{% include "messages.html" %}
-
-
 <ul>
 {% for map in maps %}
 <li><a href="{% url 'manage_maps_details' map.id %}">{{ map.name }}</a>
