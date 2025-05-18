@@ -26,9 +26,9 @@ MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 SECRET_KEY = 'django-insecure-#-c##o&a8%7$)4xa+g2adh@)m^dspq+4*+wysvh*pp8am8opab'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = [ 'pinmap.uber.space' ]
+ALLOWED_HOSTS = [ 'pinmap.uber.space', 'www.pin-map.de', 'pin-map.de' ]
 
 CSRF_TRUSTED_ORIGINS = ['https://pinmap.uber.space']
 
@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'pinmap',
+    'simplemathcaptcha',
 ]
 
 MIDDLEWARE = [
@@ -53,6 +54,9 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SECURE_SSL_REDIRECT = True
 
 ROOT_URLCONF = 'pinmap.urls'
 

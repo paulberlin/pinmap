@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
+from simplemathcaptcha.fields import MathCaptchaField
 import re
 
 from .models import Map
@@ -10,6 +11,7 @@ from .models import User
 
 class SignupForm(UserCreationForm):
   email = forms.EmailField(max_length=200, help_text='Required')
+  captcha = MathCaptchaField()
 
   class Meta:
     model = User
