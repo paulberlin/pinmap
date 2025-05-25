@@ -23,7 +23,8 @@ MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-#-c##o&a8%7$)4xa+g2adh@)m^dspq+4*+wysvh*pp8am8opab'
+with open('/home/pinmap/pinmapProject/pinmap/secret_key.txt') as f:
+  SECRET_KEY = f.read().strip() 
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
