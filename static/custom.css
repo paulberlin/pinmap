@@ -1,0 +1,8 @@
+.helptext {
+  font-style: italic;
+  font-size: smaller;
+}
+.editicon {
+  opadding-left: 5px;
+  cursor: pointer;
+}
